@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% block title %}Quản trị - KT Auto{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <div class="actions mb-24">
+      <a class="btn-outline" href="{{ url_for('admin_cars') }}">Quản lý xe / Nhập kho</a>
+      <a class="btn-outline" href="{{ url_for('admin_customers') }}">Quản lý khách hàng</a>
+      <a class="btn-outline" href="{{ url_for('admin_orders') }}">Quản lý đơn hàng</a>
+      <a class="btn-outline" href="{{ url_for('admin_reports') }}">Báo cáo</a>
+      <a class="btn-outline" href="{{ url_for('export_orders_csv') }}">Xuất CSV đơn hàng</a>
+      <a class="btn-outline" href="{{ url_for('admin_deposits') }}">Quản lý đặt cọc</a>
+    </div>
+
+    <div class="grid-4 mb-24">
+      <div class="card stat">
+        <div class="muted">Tổng xe</div>
+        <div class="num">{{ stats.car_count }}</div>
+      </div>
+      <div class="card stat">
+        <div class="muted">Khách hàng</div>
+        <div class="num">{{ stats.customer_count }}</div>
+      </div>
+      <div class="card stat">
+        <div class="muted">Đơn hàng</div>
+        <div class="num">{{ stats.order_count }}</div>
+      </div>
+      <div class="card stat">
+        <div class="muted">Tồn kho</div>
+        <div class="num">{{ stats.stock_total }}</div>
+      </div>
+    </div>
+
+    <div class="grid-3 mb-24">
+      <div class="card stat">
+        <div class="muted">Doanh thu</div>
+        <div class="num">{{ stats.revenue|vnd }}</div>
+      </div>
+      <div class="card stat">
+        <div class="muted">Top xe bán chạy</div>
+        <div class="num" style="font-size:22px;">{{ top_car['name'] if top_car else 'Chưa có' }}</div>
+        <div class="muted">{{ top_car['sold_qty'] if top_car else 0 }} xe</div>
+      </div>
+      <div class="card stat">
+        <div class="muted">Khách hàng mua nhiều nhất</div>
+        <div class="num" style="font-size:22px;">{{ top_customer['name'] if top_customer else 'Chưa có' }}</div>
+        <div class="muted">{{ top_customer['total_spent']|vnd if top_customer else '0 đ' }}</div>
+      </div>
+    </div>
+
+    <div class="grid-2 mb-24">
+      <div class="card" style="padding:20px;">
+        <h3 class="mb-16">Doanh thu theo ngày</h3>
+        <canvas id="revenueDayChart"></canvas>
+      </div>
+
+      <div class="card" style="padding:20px;">
+        <h3 class="mb-16">Doanh thu theo tháng</h3>
+        <canvas id="revenueMonthChart"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-2 mb-24">
+      <div class="card" style="padding:20px;">
+        <h3 class="mb-16">Sản phẩm bán chạy nhất</h3>
+        <canvas id="bestProductChart"></canvas>
+      </div>
+
+      <div class="card" style="padding:20px;">
+        <h3 class="mb-16">Khách hàng chi tiêu nhiều nhất</h3>
+        <canvas id="topCustomerChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="padding:24px;">
+      <h2 class="section-title">Đơn hàng gần đây</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Khách</th>
+              <th>Ngày</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in recent_orders %}
+            <tr>
+              <td>{{ order['order_code'] }}</td>
+              <td>{{ order['customer_name'] }}</td>
+              <td>{{ order['order_date'][:10] }}</td>
+              <td>{{ order['status'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const revenueDayLabels = [
+    {% for item in revenue_by_day %}
+      "{{ item['day'] }}",
+    {% endfor %}
+  ];
+
+  const revenueDayData = [
+    {% for item in revenue_by_day %}
+      {{ item['revenue'] }},
+    {% endfor %}
+  ];
+
+  const revenueMonthLabels = [
+    {% for item in revenue_by_month %}
+      "{{ item['month'] }}",
+    {% endfor %}
+  ];
+
+  const revenueMonthData = [
+    {% for item in revenue_by_month %}
+      {{ item['revenue'] }},
+    {% endfor %}
+  ];
+
+  const bestProductLabels = [
+    {% for item in best_selling_products %}
+      "{{ item['name'] }}",
+    {% endfor %}
+  ];
+
+  const bestProductData = [
+    {% for item in best_selling_products %}
+      {{ item['sold_qty'] }},
+    {% endfor %}
+  ];
+
+  const topCustomerLabels = [
+    {% for item in top_spending_customers %}
+      "{{ item['name'] }}",
+    {% endfor %}
+  ];
+
+  const topCustomerData = [
+    {% for item in top_spending_customers %}
+      {{ item['total_spent'] }},
+    {% endfor %}
+  ];
+
+  new Chart(document.getElementById('revenueDayChart'), {
+    type: 'line',
+    data: {
+      labels: revenueDayLabels,
+      datasets: [{
+        label: 'Doanh thu',
+        data: revenueDayData,
+        borderWidth: 2,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('revenueMonthChart'), {
+    type: 'bar',
+    data: {
+      labels: revenueMonthLabels,
+      datasets: [{
+        label: 'Doanh thu theo tháng',
+        data: revenueMonthData,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+
+  new Chart(document.getElementById('bestProductChart'), {
+    type: 'bar',
+    data: {
+      labels: bestProductLabels,
+      datasets: [{
+        label: 'Số lượng bán',
+        data: bestProductData,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      indexAxis: 'y'
+    }
+  });
+
+  new Chart(document.getElementById('topCustomerChart'), {
+    type: 'pie',
+    data: {
+      labels: topCustomerLabels,
+      datasets: [{
+        label: 'Chi tiêu',
+        data: topCustomerData,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+</script>
+{% endblock %}

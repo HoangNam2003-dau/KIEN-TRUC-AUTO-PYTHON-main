@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Đăng nhập - KT Auto{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="auth-box">
+    <h1 class="auth-title">ĐĂNG NHẬP</h1>
+
+    <form method="post" action="/dang-nhap" class="auth-form">
+      <input
+        type="text"
+        name="username"
+        class="auth-input"
+        placeholder="Tên đăng nhập"
+        required
+      >
+
+      <input
+        type="password"
+        name="password"
+        class="auth-input"
+        placeholder="Mật khẩu"
+        required
+      >
+
+      <button type="submit" class="auth-submit">Xác nhận</button>
+    </form>
+
+    <p class="auth-switch">
+      Chưa có tài khoản?
+      <a href="/dang-ky">Đăng ký</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

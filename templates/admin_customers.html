@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý khách hàng - KT Auto{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="actions mb-16">
+      <a class="btn-outline" href="{{ url_for('quantri') }}">← Quay lại quản trị</a>
+    </div>
+
+    <div class="card" style="padding:24px;">
+      <h2 class="section-title">Khách hàng</h2>
+
+      <form method="get" action="{{ url_for('admin_customers') }}" class="form-grid" style="margin-bottom:20px;">
+        <select name="sort_by" class="input">
+          <option value="total_spent" {% if sort_by == 'total_spent' %}selected{% endif %}>Sắp xếp theo tổng chi tiêu</option>
+          <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sắp xếp theo tên</option>
+        </select>
+
+        <select name="order" class="input">
+          <option value="desc" {% if order == 'desc' %}selected{% endif %}>Giảm dần</option>
+          <option value="asc" {% if order == 'asc' %}selected{% endif %}>Tăng dần</option>
+        </select>
+
+        <div class="actions">
+          <button type="submit" class="btn">Sắp xếp</button>
+          <a href="{{ url_for('admin_customers') }}" class="btn-outline">Đặt lại</a>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>
+                <a href="{{ url_for('admin_customers', sort_by='name', order='asc' if sort_by == 'name' and order == 'desc' else 'desc') }}">
+                  Tên khách hàng
+                </a>
+              </th>
+              <th>Email</th>
+              <th>SĐT</th>
+              <th>
+                <a href="{{ url_for('admin_customers', sort_by='total_spent', order='asc' if sort_by == 'total_spent' and order == 'desc' else 'desc') }}">
+                  Tổng chi tiêu
+                </a>
+              </th>
+              <th>Ngày tạo</th>
+              <th>Xóa</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for customer in customers %}
+            <tr>
+              <td>{{ customer['id'] }}</td>
+              <td>{{ customer['name'] }}</td>
+              <td>{{ customer['email'] }}</td>
+              <td>{{ customer['phone'] }}</td>
+              <td><strong>{{ customer['total_spent']|vnd }}</strong></td>
+              <td>{{ customer['created_at'] }}</td>
+              <td>
+                <form method="post" action="{{ url_for('admin_delete_customer', customer_id=customer['id']) }}" onsubmit="return confirm('Bạn có chắc muốn xóa khách hàng này?')">
+                  <button type="submit" class="btn-danger btn-sm">Xóa</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

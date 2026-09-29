@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Trang chủ - Kiến Trúc Auto{% endblock %}
+
+{% block content %}
+<section class="banner-section banner-full">
+  <div class="banner-slider" id="homeBannerSlider">
+    <div class="banner-track">
+      <div class="banner-slide active">
+        <img src="{{ url_for('static', filename='images/banner1.png') }}" alt="Banner 1">
+      </div>
+      <div class="banner-slide">
+        <img src="{{ url_for('static', filename='images/banner2.png') }}" alt="Banner 2">
+      </div>
+      <div class="banner-slide">
+        <img src="{{ url_for('static', filename='images/banner3.png') }}" alt="Banner 3">
+      </div>
+      <div class="banner-slide">
+        <img src="{{ url_for('static', filename='images/banner4.png') }}" alt="Banner 4">
+      </div>
+    </div>
+
+    <button class="banner-nav prev" type="button" aria-label="Banner trước">&#10094;</button>
+    <button class="banner-nav next" type="button" aria-label="Banner sau">&#10095;</button>
+
+    <div class="banner-dots" aria-label="Chọn banner">
+      <button class="banner-dot active" type="button"></button>
+      <button class="banner-dot" type="button"></button>
+      <button class="banner-dot" type="button"></button>
+      <button class="banner-dot" type="button"></button>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <section class="section">
+    <h2 class="section-title">Sản phẩm mới</h2>
+    <div class="car-grid">
+      {% for car in cars %}
+        {% if car['slug'] in ['limo-green', 'ecvan', 'minio-green'] %}
+        <div class="car-card">
+          <img src="{{ url_for('static', filename='images/' + car['image']) }}" alt="{{ car['name'] }}">
+          <div class="car-body">
+            <div class="badge">{{ car['type'] }}</div>
+            <h3>{{ car['name'] }}</h3>
+            <p class="muted">{{ car['category'] }} • {{ car['seats'] }} chỗ • Tồn {{ car['stock'] }}</p>
+            <p>{{ car['description'] }}</p>
+            <div class="price">{{ car['price']|vnd }}</div>
+            <div class="actions">
+              <a class="btn-outline" href="{{ url_for('chitietxe', car_id=car['id']) }}">Chi tiết</a>
+              <button class="btn" type="button" onclick="addToCart({{ car['id'] }})">Thêm vào giỏ</button>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Sản phẩm nổi bật</h2>
+    <div class="car-grid">
+      {% for car in cars[:6] %}
+      <div class="car-card">
+        <img src="{{ url_for('static', filename='images/' + car['image']) }}" alt="{{ car['name'] }}">
+        <div class="car-body">
+          <div class="badge">{{ car['type'] }}</div>
+          <h3>{{ car['name'] }}</h3>
+          <p class="muted">{{ car['category'] }} • {{ car['seats'] }} chỗ • Tồn {{ car['stock'] }}</p>
+          <p>{{ car['description'] }}</p>
+          <div class="price">{{ car['price']|vnd }}</div>
+          <div class="actions">
+            <a class="btn-outline" href="{{ url_for('chitietxe', car_id=car['id']) }}">Chi tiết</a>
+            <button class="btn" type="button" onclick="addToCart({{ car['id'] }})">Thêm vào giỏ</button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

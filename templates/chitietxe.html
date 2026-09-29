@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}{{ car['name'] }} - KT Auto{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="grid-2">
+    <div class="hero-card">
+      <img src="{{ url_for('static', filename='images/' + car['image']) }}" alt="{{ car['name'] }}">
+    </div>
+
+    <div class="card" style="padding:28px">
+      <span class="badge">{{ car['type'] }}</span>
+      <h1>{{ car['name'] }}</h1>
+      <p class="muted">{{ car['category'] }} • {{ car['fuel'] }} • {{ car['seats'] }} chỗ • Tồn kho {{ car['stock'] }}</p>
+      <p>{{ car['description'] }}</p>
+      <div class="price">{{ car['price']|vnd }}</div>
+
+      <div class="actions" style="margin-bottom:16px">
+        <button class="btn" type="button" onclick="addToCart({{ car['id'] }})">Thêm vào giỏ hàng</button>
+        <a class="btn-outline" href="{{ url_for('giohang') }}">Đi tới giỏ hàng</a>
+      </div>
+
+      <div class="card" style="padding:20px;background:#f8fafc">
+        <h3 style="margin-top:0">Tư vấn mua xe</h3>
+        <p class="muted">Liên hệ bộ phận kinh doanh để được tư vấn mua xe, hỗ trợ trả góp và thủ tục bàn giao.</p>
+        <p><strong>Hotline:</strong> 0905 123 456</p>
+        <p><strong>Email:</strong> cskh@kientrucauto.vn</p>
+        {% if current_role == 'admin' %}
+        <p class="muted">Bạn đang đăng nhập quản trị.</p>
+        {% elif current_role == 'customer' %}
+        <p class="muted">Bạn đang đăng nhập khách hàng.</p>
+        {% else %}
+        <div class="actions">
+          <a class="btn-outline" href="{{ url_for('dang_nhap') }}">Đăng nhập</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

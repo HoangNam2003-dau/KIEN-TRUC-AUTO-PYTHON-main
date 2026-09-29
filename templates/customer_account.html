@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Tài khoản khách hàng - KT Auto{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="card" style="padding:24px; margin-bottom:22px;">
+      <h2 class="section-title">Tài khoản khách hàng</h2>
+
+      <div class="grid-2">
+        <div>
+          <p><strong>Họ tên:</strong> {{ customer['name'] }}</p>
+          <p><strong>SĐT:</strong> {{ customer['phone'] }}</p>
+          <p><strong>Email:</strong> {{ customer['email'] }}</p>
+        </div>
+        <div>
+          <p><strong>Tổng đã mua:</strong> {{ customer['total_spent']|vnd }}</p>
+          <p><strong>Mã khách hàng:</strong> KH{{ customer['id'] }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:24px; margin-bottom:22px;">
+      <h2 class="section-title">Lịch sử đơn hàng</h2>
+
+      {% if orders %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Ngày đặt</th>
+              <th>Trạng thái</th>
+              <th>Tổng tiền</th>
+              <th>Loại yêu cầu</th>
+              <th>Hóa đơn</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr>
+              <td>{{ order['order_code'] }}</td>
+              <td>{{ order['order_date'] }}</td>
+              <td>
+                {% if order['status'] == 'Chờ xác nhận' %}
+                  <span class="badge">Chờ xác nhận</span>
+                {% elif order['status'] == 'Chờ đặt cọc' %}
+                  <span class="badge">Chờ đặt cọc</span>
+                {% elif order['status'] == 'Chờ tư vấn' %}
+                  <span class="badge">Chờ tư vấn</span>
+                {% elif order['status'] == 'Đã xác nhận' %}
+                  <span class="badge">Đã xác nhận</span>
+                {% elif order['status'] == 'Hoàn tất' %}
+                  <span class="badge">Hoàn tất</span>
+                {% elif order['status'] == 'Đã hủy' %}
+                  <span class="badge">Đã hủy</span>
+                {% else %}
+                  <span class="badge">{{ order['status'] }}</span>
+                {% endif %}
+              </td>
+              <td><strong>{{ order['total_amount']|vnd }}</strong></td>
+              <td>
+                {% if order['status'] == 'Chờ đặt cọc' %}
+                  Đặt cọc giữ xe
+                {% elif order['status'] == 'Chờ tư vấn' %}
+                  Tư vấn trả góp
+                {% else %}
+                  Mua xe
+                {% endif %}
+              </td>
+              <td>
+                <a class="btn-outline btn-sm" href="{{ url_for('invoice', order_id=order['id']) }}">Xem</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="muted">Bạn chưa có đơn hàng nào.</p>
+      {% endif %}
+    </div>
+
+    <div class="card" style="padding:24px;">
+      <h2 class="section-title">Lịch sử đặt cọc</h2>
+
+      {% if deposits %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mã cọc</th>
+              <th>Xe</th>
+              <th>Số tiền cọc</th>
+              <th>Ngày tạo</th>
+              <th>Trạng thái</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in deposits %}
+            <tr>
+              <td>{{ item['deposit_code'] }}</td>
+              <td>{{ item['car_name'] }}</td>
+              <td><strong>{{ item['deposit_amount']|vnd }}</strong></td>
+              <td>{{ item['created_at'] }}</td>
+              <td>
+                <span class="badge">{{ item['status'] }}</span>
+              </td>
+              <td>{{ item['note'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="muted">Bạn chưa có phiếu đặt cọc nào.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

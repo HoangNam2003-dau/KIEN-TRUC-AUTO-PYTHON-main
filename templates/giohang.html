@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Giỏ hàng - KT Auto{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Giỏ hàng</h2>
+
+    {% if cart_items %}
+      <div class="card cart-table-card">
+        <div class="table-wrap">
+          <table class="table cart-table compact-cart-table">
+            <thead>
+              <tr>
+                <th>Hình ảnh</th>
+                <th>Tên xe</th>
+                <th>Loại xe</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Tạm tính</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart_items %}
+              <tr>
+                <td class="cart-img-cell">
+                  <img
+                    src="{{ url_for('static', filename='images/' + item['image']) }}"
+                    alt="{{ item['name'] }}"
+                    class="cart-table-image"
+                  >
+                </td>
+
+                <td>
+                  <strong>{{ item['name'] }}</strong>
+                </td>
+
+                <td>
+                  <div>{{ item['type'] }}</div>
+                  <div class="muted">{{ item['category'] }}</div>
+                </td>
+
+                <td>
+                  <strong>{{ item['price']|vnd }}</strong>
+                </td>
+
+                <td>
+                  <form method="post" action="/api/cart/update/{{ item['car_id'] }}" class="cart-inline-form">
+                    <input
+                      type="number"
+                      name="quantity"
+                      min="1"
+                      value="{{ item['quantity'] }}"
+                      class="qty-input"
+                    >
+                    <button type="submit" class="btn-outline btn-sm">Cập nhật</button>
+                  </form>
+                </td>
+
+                <td>
+                  <strong>{{ item['line_total']|vnd }}</strong>
+                </td>
+
+                <td>
+                  <form method="post" action="/api/cart/remove/{{ item['car_id'] }}">
+                    <button type="submit" class="btn-danger btn-sm">Xóa</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="cart-summary-wrap">
+        <div class="card summary-card compact-summary-card horizontal-summary-card">
+          <h3>Thông tin khách hàng</h3>
+
+          <form method="post" action="/checkout" class="order-form-horizontal">
+            <div class="order-form-left">
+              <input
+                type="text"
+                name="name"
+                placeholder="Họ và tên"
+                value="{{ current_customer['name'] if current_customer else '' }}"
+                required
+              >
+
+              <input
+                type="text"
+                name="phone"
+                placeholder="Số điện thoại"
+                value="{{ current_customer['phone'] if current_customer else '' }}"
+                required
+              >
+
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value="{{ current_customer['email'] if current_customer else '' }}"
+              >
+
+              <textarea name="note" placeholder="Ghi chú chung"></textarea>
+            </div>
+
+            <div class="order-form-right">
+              <div class="checkout-mode-box">
+                <label class="checkout-mode-item">
+                  <input type="radio" name="checkout_mode" value="order" checked onchange="toggleDepositAmount()">
+                  <span>Gửi yêu cầu mua xe</span>
+                </label>
+
+                <label class="checkout-mode-item">
+                  <input type="radio" name="checkout_mode" value="deposit" onchange="toggleDepositAmount()">
+                  <span>Đặt cọc giữ xe</span>
+                </label>
+
+                <label class="checkout-mode-item">
+                  <input type="radio" name="checkout_mode" value="consult" onchange="toggleDepositAmount()">
+                  <span>Tư vấn trả góp</span>
+                </label>
+              </div>
+
+              <div id="depositAmountWrap" class="deposit-amount-wrap" style="display:none;">
+                <input
+                  type="text"
+                  id="depositAmountDisplay"
+                  value="{{ ((cart_total or 0) * 0.05)|int|vnd }}"
+                  readonly
+                >
+                <input
+                  type="hidden"
+                  name="deposit_amount"
+                  value="{{ ((cart_total or 0) * 0.05)|int }}"
+                >
+                <div class="muted">Tiền đặt cọc được tính tự động = 5% giá trị đơn hàng</div>
+              </div>
+
+              <div class="summary-line">
+                <span>Tổng sản phẩm</span>
+                <strong>{{ cart_count }}</strong>
+              </div>
+
+              <div class="summary-line">
+                <span>Tổng tiền tạm tính</span>
+                <strong>{{ cart_total|vnd }}</strong>
+              </div>
+
+              <button type="submit" class="btn" style="width:100%">Gửi thông tin</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <div class="card empty-cart">
+        <p>Giỏ hàng đang trống.</p>
+        <a class="btn" href="{{ url_for('trangchu') }}">Tiếp tục mua xe</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+function toggleDepositAmount() {
+  const selected = document.querySelector('input[name="checkout_mode"]:checked');
+  const wrap = document.getElementById('depositAmountWrap');
+  if (!wrap || !selected) return;
+  wrap.style.display = selected.value === 'deposit' ? 'block' : 'none';
+}
+document.addEventListener('DOMContentLoaded', toggleDepositAmount);
+</script>
+{% endblock %}

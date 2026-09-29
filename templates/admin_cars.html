@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý xe - KT Auto{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="actions mb-16">
+      <a class="btn-outline" href="{{ url_for('quantri') }}">← Quay lại quản trị</a>
+    </div>
+
+    <div class="card" style="padding:24px; margin-bottom:24px;">
+      <h2 class="section-title">Thêm xe mới</h2>
+
+      <form method="post" action="{{ url_for('admin_cars') }}" class="form-grid" enctype="multipart/form-data">
+        <input class="input" type="text" name="name" placeholder="Tên xe" required>
+        <input class="input" type="text" name="slug" placeholder="Slug, ví dụ vf8">
+
+        <input class="input" type="text" name="type" placeholder="Loại xe (Xe Điện / Xe Xăng)" required>
+        <input class="input" type="text" name="category" placeholder="Phân khúc" required>
+
+        <input class="input" type="number" name="price" placeholder="Giá bán" required>
+        <input class="input" type="number" name="stock" placeholder="Tồn kho" required>
+
+        <input class="input" type="number" name="seats" placeholder="Số chỗ" required>
+        <input class="input" type="text" name="fuel" placeholder="Nhiên liệu (Điện / Xăng)">
+
+        <div style="grid-column: 1 / -1;">
+          <label style="display:block; margin-bottom:8px; font-weight:600;">Chọn ảnh xe</label>
+          <input class="input" type="file" name="image_file" accept=".png,.jpg,.jpeg,.webp">
+        </div>
+
+        <div style="grid-column: 1 / -1;">
+          <input class="input" type="text" name="image" placeholder="Hoặc nhập tên file ảnh có sẵn, ví dụ vf5.png">
+        </div>
+
+        <textarea name="description" placeholder="Mô tả xe" style="grid-column: 1 / -1;"></textarea>
+
+        <div style="grid-column: 1 / -1;">
+          <button class="btn" type="submit">Thêm xe</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card" style="padding:24px;">
+      <h2 class="section-title">Danh sách xe / Nhập kho</h2>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ảnh</th>
+              <th>Tên xe</th>
+              <th>Loại</th>
+              <th>Phân khúc</th>
+              <th>Giá</th>
+              <th>Tồn kho</th>
+              <th>Nhập kho</th>
+              <th>Xóa</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for car in cars %}
+            <tr>
+              <td>{{ car['id'] }}</td>
+              <td>
+                {% if car['image'] %}
+                <img
+                  src="{{ url_for('static', filename='images/' + car['image']) }}"
+                  alt="{{ car['name'] }}"
+                  style="width:90px; height:60px; object-fit:cover; border-radius:8px;"
+                >
+                {% else %}
+                <span class="muted">Không có ảnh</span>
+                {% endif %}
+              </td>
+              <td>{{ car['name'] }}</td>
+              <td>{{ car['type'] }}</td>
+              <td>{{ car['category'] }}</td>
+              <td>{{ car['price']|vnd }}</td>
+              <td><strong>{{ car['stock'] }}</strong></td>
+              <td>
+                <form method="post" action="{{ url_for('admin_restock_car', car_id=car['id']) }}" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <input
+                    class="input"
+                    type="number"
+                    name="restock_quantity"
+                    min="1"
+                    value="1"
+                    style="width:90px; padding:8px 10px;"
+                    required
+                  >
+                  <button class="btn-outline btn-sm" type="submit">Nhập kho</button>
+                </form>
+              </td>
+              <td>
+                <form method="post" action="{{ url_for('admin_delete_car', car_id=car['id']) }}" onsubmit="return confirm('Bạn có chắc muốn xóa xe này?')">
+                  <button class="btn-danger btn-sm" type="submit">Xóa</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

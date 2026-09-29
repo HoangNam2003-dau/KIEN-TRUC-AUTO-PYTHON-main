@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Đăng ký - KT Auto{% endblock %}
+{% block content %}
+<section class="auth-page">
+  <div class="auth-box">
+    <h1 class="auth-title">ĐĂNG KÝ</h1>
+    <form method="post" action="{{ url_for('dang_ky') }}" class="auth-form">
+      <input type="text" name="name" class="auth-input" placeholder="Họ và tên" required>
+      <input type="text" name="phone" class="auth-input" placeholder="Số điện thoại" required>
+      <input type="email" name="email" class="auth-input" placeholder="Email">
+      <input type="text" name="username" class="auth-input" placeholder="Tên đăng nhập" required>
+      <input type="password" name="password" class="auth-input" placeholder="Mật khẩu" required>
+      <button type="submit" class="auth-submit">Tạo tài khoản</button>
+    </form>
+    <p class="auth-switch">Đã có tài khoản? <a href="{{ url_for('dang_nhap') }}">Đăng nhập</a></p>
+  </div>
+</section>
+{% endblock %}

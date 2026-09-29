@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý đặt cọc - KT Auto{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="actions mb-16">
+      <a class="btn-outline" href="{{ url_for('quantri') }}">← Quay lại quản trị</a>
+      <a class="btn-outline" href="{{ url_for('admin_orders') }}">Quản lý đơn hàng</a>
+    </div>
+
+    <div class="card" style="padding:24px;">
+      <h2 class="section-title">Phiếu đặt cọc</h2>
+
+      <form method="get" action="{{ url_for('admin_deposits') }}" class="form-grid" style="margin-bottom:20px;">
+        <select name="status" class="input">
+          <option value="">Tất cả trạng thái</option>
+          <option value="Chờ xác nhận" {% if status_filter == 'Chờ xác nhận' %}selected{% endif %}>Chờ xác nhận</option>
+          <option value="Đã xác nhận" {% if status_filter == 'Đã xác nhận' %}selected{% endif %}>Đã xác nhận</option>
+          <option value="Đã thanh toán" {% if status_filter == 'Đã thanh toán' %}selected{% endif %}>Đã thanh toán</option>
+          <option value="Đã hủy" {% if status_filter == 'Đã hủy' %}selected{% endif %}>Đã hủy</option>
+        </select>
+
+        <select name="order" class="input">
+          <option value="desc" {% if order == 'desc' %}selected{% endif %}>Mới nhất</option>
+          <option value="asc" {% if order == 'asc' %}selected{% endif %}>Cũ nhất</option>
+        </select>
+
+        <div class="actions">
+          <button type="submit" class="btn">Lọc</button>
+          <a href="{{ url_for('admin_deposits') }}" class="btn-outline">Đặt lại</a>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mã cọc</th>
+              <th>Khách hàng</th>
+              <th>SĐT</th>
+              <th>Email</th>
+              <th>Xe</th>
+              <th>Số tiền cọc</th>
+              <th>Ngày tạo</th>
+              <th>Trạng thái</th>
+              <th>Xóa</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in deposits %}
+            <tr>
+              <td>{{ item['deposit_code'] }}</td>
+              <td>{{ item['customer_name'] }}</td>
+              <td>{{ item['phone'] }}</td>
+              <td>{{ item['email'] }}</td>
+              <td>{{ item['car_name'] }}</td>
+              <td><strong>{{ item['deposit_amount']|vnd }}</strong></td>
+              <td>{{ item['created_at'] }}</td>
+              <td>
+                <form method="post" action="{{ url_for('admin_update_deposit', deposit_id=item['id']) }}" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <select name="status" class="input" style="min-width:200px;">
+                    <option value="Chờ xác nhận" {% if item['status'] == 'Chờ xác nhận' %}selected{% endif %}>Chờ xác nhận</option>
+                    <option value="Đã xác nhận" {% if item['status'] == 'Đã xác nhận' %}selected{% endif %}>Đã xác nhận</option>
+                    <option value="Đã thanh toán" {% if item['status'] == 'Đã thanh toán' %}selected{% endif %}>Đã thanh toán</option>
+                    <option value="Đã hủy" {% if item['status'] == 'Đã hủy' %}selected{% endif %}>Đã hủy</option>
+                  </select>
+                  <button type="submit" class="btn-outline btn-sm">Lưu</button>
+                </form>
+              </td>
+              <td>
+                <form method="post" action="{{ url_for('admin_delete_deposit', deposit_id=item['id']) }}" onsubmit="return confirm('Bạn có chắc muốn xóa phiếu đặt cọc này?')">
+                  <button type="submit" class="btn-danger btn-sm">Xóa</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

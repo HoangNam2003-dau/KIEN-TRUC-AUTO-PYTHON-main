@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} - KT Auto{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="catalog-head">
+      <h2 class="section-title">{{ title }}</h2>
+      <form method="get" class="search-form">
+        <input type="text" name="q" value="{{ search or '' }}" class="input" placeholder="Tìm theo tên hoặc phân khúc">
+        <button class="btn" type="submit">Tìm</button>
+      </form>
+    </div>
+    <div class="car-grid">
+      {% for car in cars %}
+      <div class="car-card">
+        <img src="{{ url_for('static', filename='images/' + car['image']) }}" alt="{{ car['name'] }}">
+        <div class="car-body">
+          <div class="badge">{{ car['type'] }}</div>
+          <h3>{{ car['name'] }}</h3>
+          <p class="muted">{{ car['category'] }} • {{ car['seats'] }} chỗ • Tồn {{ car['stock'] }}</p>
+          <p>{{ car['description'] }}</p>
+          <div class="price">{{ car['price']|vnd }}</div>
+          <div class="actions">
+            <a class="btn-outline" href="{{ url_for('chitietxe', car_id=car['id']) }}">Chi tiết</a>
+            <button class="btn" type="button" onclick="addToCart({{ car['id'] }})">Thêm giỏ hàng</button>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <p class="muted">Không có xe phù hợp.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

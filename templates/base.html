@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}KT Auto{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <div class="nav-left">
+        <a class="brand" href="{{ url_for('trangchu') }}">
+  <div class="logo-box">
+    <div class="logo-stack">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="KT Auto Logo" class="site-logo">
+      <div class="brand-subtitle">Đam mê xe <br> Chất lượng hàng đầu</div>
+    </div>
+  </div>
+</a>
+
+        <nav class="menu menu-left">
+          <a class="btn-outline" href="{{ url_for('trangchu') }}">Trang chủ</a>
+          <a class="btn-outline" href="{{ url_for('xexang') }}">Xe Xăng</a>
+          <a class="btn-outline" href="{{ url_for('xedien') }}">Xe Điện</a>
+          <a class="btn-outline" href="{{ url_for('cuahang') }}">Cửa hàng</a>
+
+        </nav>
+      </div>
+
+      <nav class="menu menu-right">
+        <div class="search-box">
+         <form class="search-form" action="{{ url_for('cuahang') }}" method="get">
+            <input type="text" name="q" class="search-input" placeholder="Tìm kiếm xe..." value="{{ request.args.get('q', '') }}">
+            <button type="submit" class="search-icon-btn" aria-label="Tìm kiếm">
+              <span class="search-icon">🔍</span>
+            </button>
+          </form>
+        </div>
+
+        <a class="cart-icon-btn" href="{{ url_for('giohang') }}" aria-label="Giỏ hàng">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-badge" id="cart-count-text">{{ cart_count|default(0) }}</span>
+        </a>
+
+        {% if session.get('role') == 'admin' %}
+          <a class="btn" href="{{ url_for('quantri') }}">Quản trị</a>
+          <a class="btn-outline" href="{{ url_for('dang_xuat') }}">Đăng xuất</a>
+        {% elif session.get('role') == 'customer' %}
+          <a class="btn-outline" href="{{ url_for('tai_khoan_kh') }}">Tài khoản</a>
+          <a class="btn" href="{{ url_for('dang_xuat') }}">Đăng xuất</a>
+        {% else %}
+          <a class="btn" href="{{ url_for('dang_nhap') }}">Đăng nhập</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-wrap">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-main">
+    <div class="footer-col footer-brand">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="KT Auto Logo" class="footer-logo">
+      <p class="footer-slogan">Đam mê xe - Chất lượng hàng đầu</p>
+      <p><strong>Trụ sở chính:</strong> Nguyễn Duy Hiệu, Sơn Trà, Tp. Đà Nẵng.</p>
+      <p><strong>Hotline:</strong> 0384015192</p>
+      <p><strong>Email:</strong> ktauto.cskh@gmail.com</p>
+
+      <div class="footer-contact-buttons">
+        <a href="tel:0384015192" class="footer-btn">📞 CALL VN</a>
+        <a href="mailto:ktauto.cskh@gmail.com" class="footer-btn">✉ E-MAIL</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>SẢN PHẨM MỚI</h4>
+      <ul>
+        <li><a href="{{ url_for('cuahang', q='ecvan') }}">VINFAST ECVAN</a></li>
+        <li><a href="{{ url_for('cuahang', q='limo green') }}">VINFAST LIMO GREEN</a></li>
+        <li><a href="{{ url_for('cuahang', q='minio green') }}">VINFAST MINIO GREEN</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>SẢN PHẨM HOT</h4>
+      <ul>
+        <li><a href="{{ url_for('cuahang', q='vf3') }}">VINFAST VF3</a></li>
+        <li><a href="{{ url_for('cuahang', q='vf5') }}">VINFAST VF5</a></li>
+        <li><a href="{{ url_for('cuahang', q='vf6') }}">VINFAST VF6</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>SẢN PHẨM CAO CẤP</h4>
+      <ul>
+        <li><a href="{{ url_for('cuahang', q='vf7') }}">VINFAST VF7</a></li>
+        <li><a href="{{ url_for('cuahang', q='vf8') }}">VINFAST VF8</a></li>
+        <li><a href="{{ url_for('cuahang', q='vf9') }}">VINFAST VF9</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container">
+      © [Copyright 2026] KT Auto. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+</body>
+</html>
